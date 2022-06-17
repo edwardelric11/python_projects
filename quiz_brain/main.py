@@ -1,17 +1,22 @@
 # Quiz
 
-import data
+from data import question_data
 from question_model import Question
 from quiz_brain import QuizBrain
 
 question_bank = []
-for dic in data.question_data:
-    question_bank.append(Question(dic["question"], dic["correct_answer"]))
+for question in question_data:
+    question_text = question["question"]
+    question_answer = question["correct_answer"]
+    new_question = Question(question_text, question_answer)
+    question_bank.append(new_question)
 
 qb = QuizBrain(question_bank)
 # repeat while there are still questions remaining
-while qb.still_has_questions():
-    qb.next_question()
-# no need for a + 1 to the question_number here, as it gets increased after the last question is completed
 
-print(f"Your final score is: {qb.score}/{qb.question_number}.")
+limit = int(input("How many questions do you wish for? : "))
+
+while qb.still_has_questions(limit):
+    qb.next_question()d
+
+print(f"You've completed the quiz with a final score of {qb.score} out of {qb.question_number}.")
