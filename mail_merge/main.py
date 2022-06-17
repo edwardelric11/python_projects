@@ -23,7 +23,7 @@ def load_names(text_file):
 
 
 def save_letter(content, file_name):
-    """Takes STRs and saves the content in a text file with the provided name."""
+    """Takes strings and saves the content in a text file with the provided name."""
     # set the relative path and file name with appropriate extension
     output = OUTPUT_FOLDER + file_name + ".txt"
     with open(output, mode="w") as file:
