@@ -17,6 +17,6 @@ qb = QuizBrain(question_bank)
 limit = int(input("How many questions do you wish for? : "))
 
 while qb.still_has_questions(limit):
-    qb.next_question()d
+    qb.next_question()
 
 print(f"You've completed the quiz with a final score of {qb.score} out of {qb.question_number}.")
