@@ -1,5 +1,6 @@
 class QuizBrain:
     def __init__(self, questions_list):
+        """Constructor"""
         self.question_number = 0
         self.questions_list = questions_list
         self.score = 0
@@ -26,14 +27,13 @@ class QuizBrain:
     def check_answer(self, choice, answer):
         """Takes two STR and compares them, then prints the result and score."""
         if choice == answer.lower():
-            print("You got it right!")
             self.score += 1
+            print("Yay! you got it right!")
         else:
-            print("That's wrong.")
-        # show the correct answer either way
-        print(f"The correct answer was: {answer}.")
+            print("Oops! That's wrong.")
+            print(f"The correct answer was: {answer}.")
         # show the number of correct / total answers
-        # again it needs + 1 since the printed value starts with 1
+        # it needs + 1 since the printed value starts with 1
         print(f"Your current score is: {self.score}/{self.question_number + 1}.")
         # print an empty line between the questions
         print()
