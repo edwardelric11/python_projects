@@ -32,4 +32,4 @@ output = [codes_dict[char] for char in word if char in codes_dict]
 if len(output) > 0:
    print(" ".join(output))
 
-print("Goodbye.")
+print("Done.")
