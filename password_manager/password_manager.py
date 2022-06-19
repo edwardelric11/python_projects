@@ -3,9 +3,10 @@
 import tkinter as tk
 import tkinter.messagebox as mb
 import random
+import json
 
 FONT = ("Arial", 12)
-BTN_FONT = ("Arial", 10)
+BTN_FONT = ("Arial", 12)
 DEFAULT_USERNAME = "email@example.com"
 
 # to make sure the password is always fully displayed in its field
@@ -22,7 +23,8 @@ SEPARATOR = "\x1f"
 
 
 def generate_password():
-    # using list comprehensions
+    """Generates a password matching the parameters and copies it to the clipboard."""
+    # list comprehensions
     l_list = [let for let in LETTERS]
     n_list = [num for num in NUMBERS]
     s_list = [sym for sym in SYMBOLS]
@@ -78,11 +80,74 @@ def add_entry():
 
 
 def write_data(entry_list):
-    """Takes a LIST and writes the contents in the file, separated by the SEPARATOR character."""
-    # using "append" mode so existing
-    with open(DATA_FILE, "a") as f:
-        # for simplicity, use the special character between each part of the entry
-        f.write(f"{SEPARATOR.join(entry_list)}\n")
+    """Takes a LIST and writes the contents into the file in JSON format"""
+    # convert the list into a dictionary so it can be saved as JSON
+    entry_dict = {
+        entry_list[0]: {
+            "email": entry_list[1],
+            "password": entry_list[2]
+        }
+    }
+
+    # loads the data, updates if there are existing entries
+    data = load_data()
+    if data is not None:
+        data.update(entry_dict)
+    else:
+        data = entry_dict
+
+    # save the file, this will create a new one if it doesn't exist
+    with open(DATA_FILE, "w") as f:
+        json.dump(data, f, indent=4)
+
+
+def load_data():
+    """Loads the data file, returns a DICT or None."""
+    # load the file, deal with the case that it does not exist
+    try:
+        with open(DATA_FILE, "r") as f:
+            try:
+                data = json.load(f)
+                return data
+            # in case the file is empty (or contains invalid data)
+            except json.JSONDecodeError:
+                return None
+    # in case the file does not exist
+    except FileNotFoundError:
+        return None
+
+
+def search():
+    """Searches the data for an entry matching the string in the "Website" field."""
+    search_text = website_fld.get()
+    # skip if the field is empty
+    if search_text != "":
+        result = search_data(search_text)
+        if result is not None:
+            # using a new window with fields that would allow for easier copying would be more user-friendly
+            mb.showinfo(title=search_text, message=f"Entry found:\n\n"
+                                                   f"Email/Username: {result['email']}\n"
+                                                   f"Password: {result['password']}")
+        # in case match was found or there is so valid data file
+        else:
+            mb.showwarning(title=search_text,
+                           message=f"No matching entry was found.")
+
+
+def search_data(name):
+    """Takes a STR and searches for it in the data, returns a DICT or None if not found."""
+    # use the same function to load the data
+    data = load_data()
+    if data is not None:
+        try:
+            found = data.get(name)
+            return found
+        # if there is no match
+        except KeyError:
+            return None
+    # in case there is no file (or it's empty)
+    else:
+        return None
 
 
 # main window setup
@@ -114,22 +179,24 @@ password_lbl = tk.Label(bottom_frame, text="Password:", font=FONT, width=16)
 password_lbl.grid(row=2, column=0, pady=4)
 
 # middle+right column, span across 2 columns
-website_fld = tk.Entry(bottom_frame, font=FONT, width=32)
-website_fld.grid(row=0, column=1, columnspan=2, pady=4)
-# to make the cursor active in the field
-website_fld.focus()
 email_fld = tk.Entry(bottom_frame, font=FONT, width=32)
 email_fld.grid(row=1, column=1, columnspan=2, pady=4)
 email_fld.insert(0, DEFAULT_USERNAME)
-add_btn = tk.Button(bottom_frame, text="Add", font=BTN_FONT, bg="#ddd", width=32, relief="raised",
+add_btn = tk.Button(bottom_frame, text="Add Password", font=BTN_FONT, bg="#ddd", width=32, relief="raised",
                     command=add_entry)
 add_btn.grid(row=3, column=1, columnspan=2, pady=8)
 
 # middle column
+website_fld = tk.Entry(bottom_frame, font=FONT, width=16)
+website_fld.grid(row=0, column=1, padx=9, pady=4)
+website_fld.focus()
 password_fld = tk.Entry(bottom_frame, font=FONT, width=16)
 password_fld.grid(row=2, column=1, padx=9, pady=4)
 
 # right column
+search_btn = tk.Button(bottom_frame, text="Search",
+                       font=BTN_FONT, width=15, relief="raised", command=search)
+search_btn.grid(row=0, column=2, padx=7, pady=4)
 password_btn = tk.Button(bottom_frame, text="Generate Password", font=BTN_FONT, width=15, relief="raised",
                          command=generate_password)
 password_btn.grid(row=2, column=2, padx=7, pady=4)
