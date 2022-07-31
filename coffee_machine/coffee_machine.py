@@ -1,8 +1,5 @@
 # Coffee Machine
 
-import art
-
-
 MENU = {
     "espresso": {
         "ingredients": {
